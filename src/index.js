@@ -9,6 +9,7 @@ import {
 import Marketplace from './pages/MarketplacePage';
 import NFTPage from './pages/NFTPage';
 import ProfilePage from './pages/ProfilePage';
+import ListNFTPage from './pages/ListNFTPage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -18,6 +19,7 @@ root.render(
         <Route path="/" element={<Marketplace />}/>
         <Route path="/nftPage" element={<NFTPage />}/>
         <Route path="/profile" element={<ProfilePage />}/>
+        <Route path="/sellNFT" element={<ListNFTPage />}/>
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
