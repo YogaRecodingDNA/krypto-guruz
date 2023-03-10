@@ -1,5 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 const fs = require('fs');
+require('dotenv').config();
 
 // eslint-disable-next-line no-undef
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -16,6 +17,10 @@ module.exports = {
     hardhat: {
       chainId: 1337
     },
+    goerli: {
+      url: process.env.REACT_APP_ALCHEMY_API_URL,
+      accounts: [ process.env.REACT_APP_PRIVATE_KEY ]
+    }
   },
   solidity: {
     version: "0.8.9",

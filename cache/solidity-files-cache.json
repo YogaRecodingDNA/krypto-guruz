@@ -2,7 +2,7 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/chadd/Projects/krypto-guruz/contracts/Greeter.sol": {
-      "lastModificationDate": 1678407379572,
+      "lastModificationDate": 1678460931959,
       "contentHash": "77a3ad6a3da91fc8a91f58f684ad514f",
       "sourceName": "contracts/Greeter.sol",
       "solcConfig": {
