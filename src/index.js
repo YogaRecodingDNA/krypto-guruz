@@ -6,7 +6,8 @@ import {
   Routes,
   Route,
 } from "react-router-dom";
-import Marketplace from './components/Marketplace';
+import Marketplace from './pages/MarketplacePage';
+import NFTPage from './pages/NFTPage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,6 +15,7 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Marketplace />}/>
+        <Route path="/nftPage" element={<NFTPage />}/>
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

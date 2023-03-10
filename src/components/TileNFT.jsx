@@ -1,7 +1,7 @@
 // import axie from "../tile.jpeg";
 import { Link } from "react-router-dom";
 
-function NFTTile (data) {
+function TileNFT (data) {
     return (
         <Link to="/">
         <div className="border-2 ml-12 mt-5 mb-12 flex flex-col items-center rounded-lg w-48 md:w-72 shadow-2xl">
@@ -17,7 +17,7 @@ function NFTTile (data) {
     )
 }
 
-export default NFTTile;
+export default TileNFT;
 
 
 
