@@ -1,7 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-ethers");
-const fs = require('fs');
 require('dotenv').config();
+const fs = require('fs');
 
 // eslint-disable-next-line no-undef
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {

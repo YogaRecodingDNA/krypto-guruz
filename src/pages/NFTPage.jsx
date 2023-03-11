@@ -29,7 +29,7 @@ const [ currentAddress, setCurrentAddress ] = useState("0x");
                         Seller: <span className="text-sm">{data.seller}</span>
                     </div>
                     <div>
-                    { currentAddress == data.owner || currentAddress == data.seller ?
+                    { currentAddress === data.owner || currentAddress === data.seller ?
                         <div className="text-emerald-700">You are the owner of this NFT</div>
                         : <button className="enableEthereumButton bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">Buy this NFT</button>
                     }

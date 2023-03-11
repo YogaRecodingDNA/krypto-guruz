@@ -1,9 +1,92 @@
 import Navbar from "../components/Navbar";
 import { useState } from "react";
+import { uploadFileToIPFS, uploadJSONToIPFS } from "../pinata";
+import Marketplace from "../Marketplace.json";
+
 
 const ListNFTPage = () => {
-    const [formParams, setFormParams] = useState({ name: '', description: '', price: ''});
-    const [message, setMessage] = useState('');
+    const [ formParams, setFormParams ] = useState({ name: "", description: "", price: ""});
+    const [ fileURL, setFileURL ] = useState(null);
+    const [ message, setMessage ] = useState("");
+    const ethers = require("ethers");
+
+
+    // Upload File (IMAGE) to Pinata
+    const onChangeFile = async (e) => {
+        let file = e.target.files[0];
+
+        try {
+            const response = await uploadFileToIPFS(file);
+            if(response.success === true){
+                console.log("Uploaded image to Pinata: ", response.pinataURL);
+                setFileURL(response.pinataURL);
+            }
+        } catch(error) {
+            console.error("Error during the file upload:", error);
+        }
+    }
+
+    
+    // Upload metadata to IPFS and Fetch URL from PINATA
+    const uploadMetadataToIPFS = async () => {
+        // Check for missing form params
+        const { name, description, price } = formParams;
+        if (!name || !description || !price || !fileURL) {
+            return;
+        }
+
+        // Set params for JSON Object
+        const nftJSON = { name, description, price, image: fileURL }
+
+        // Upload to IPFS and Return URL
+        try {
+            const response = await uploadJSONToIPFS(nftJSON);
+
+            if(response.success === true) {
+                console.log("Successfully uploaded JSON to Pinata: ", response);
+                return response.pinataURL;
+            }
+        } catch (error) {
+            console.error("Error uploading metadata to Pinata", error);
+        }
+    }
+
+
+    // MINT AND LIST NFT (SUBMITTED FORM)
+    const listNFT = async (e) => {
+        e.preventDefault();
+
+        try {
+            // Get URL
+            const metadataURL = await uploadMetadataToIPFS();
+            const provider = new ethers.providers.Web3Provider(window.ethereum); // Gateway to Goerli Testnet -> Metamask injects into the browser window
+            const signer = provider.getSigner(); // Get the address
+
+            setMessage("Uploading now... please wait (up to 5 mins)");
+
+            // Retrieve correct contract by passing the address, abi, and signer
+            let contract = new ethers.Contract(Marketplace.address, Marketplace.abi, signer);
+
+            // Convert decimal val to ethers val so contract understands the values it calculates
+            const price = ethers.utils.parseUnits(formParams.price, "ether");
+            // Get listed price from contract and convert to string
+            let listingPrice = await contract.getListPrice().toString();
+
+            let transaction = await contract.createToken(metadataURL, price, {value: listingPrice});
+            await transaction.wait();
+
+            // Message user, reset state fields, redirect to marketplace
+            alert("Successfully Minted your NFT!");
+            setMessage("");
+            setFormParams({ name: "", description: "", price: ""});
+            window.location.replace("/");
+
+        } catch (error) {
+            alert("Upload error", error);
+        }
+    }
+
+
 
     return (
         <div className="">
@@ -49,8 +132,8 @@ const ListNFTPage = () => {
                     <input 
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                         type="number"
-                        placeholder="Min 0.01 ETH"
-                        step="0.01"
+                        placeholder="Min 0.001 ETH"
+                        step="0.001"
                         value={formParams.price}
                         onChange={e => setFormParams({...formParams, price: e.target.value})}
                     />
@@ -62,12 +145,12 @@ const ListNFTPage = () => {
                     >
                         Upload Image
                     </label>
-                    <input type={"file"} onChange={""} />
+                    <input type={"file"} onChange={onChangeFile} />
                 </div>
                 <br></br>
                 <div className="text-green text-center">{message}</div>
                 <button
-                    onClick={""} 
+                    onClick={listNFT} 
                     className="font-bold mt-10 w-full bg-purple-500 text-white rounded p-2 shadow-lg"
                 >
                     List NFT
