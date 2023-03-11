@@ -7,7 +7,7 @@ const FormData = require('form-data');
 
 export const uploadJSONToIPFS = async(JSONBody) => {
     const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
-    //making axios POST request to Pinata ⬇️
+    //making axios POST request to Pinata ⬇️ with URL plugged into rest of metadata
     return axios 
         .post(url, JSONBody, {
             headers: {
@@ -31,7 +31,9 @@ export const uploadJSONToIPFS = async(JSONBody) => {
     });
 };
 
+// UPLOAD IMAGE TO IPFS
 export const uploadFileToIPFS = async(file) => {
+    // Pin image to IPFS
     const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
     //making axios POST request to Pinata ⬇️
     
@@ -46,7 +48,7 @@ export const uploadFileToIPFS = async(file) => {
     });
     data.append('pinataMetadata', metadata);
 
-    //pinataOptions are optional
+    //pinataOptions are optional =========================================
     const pinataOptions = JSON.stringify({
         cidVersion: 0,
         customPinPolicy: {
@@ -63,6 +65,7 @@ export const uploadFileToIPFS = async(file) => {
         }
     });
     data.append('pinataOptions', pinataOptions);
+    // ====================================================================
 
     return axios 
         .post(url, data, {
@@ -75,6 +78,7 @@ export const uploadFileToIPFS = async(file) => {
         })
         .then(function (response) {
             console.log("image uploaded", response.data.IpfsHash)
+            // Returns finalized TokenURI with IPFS hash to be passed to the smart contract
             return {
                success: true,
                pinataURL: "https://gateway.pinata.cloud/ipfs/" + response.data.IpfsHash

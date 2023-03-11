@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicensed
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 
 import "hardhat/console.sol"; // solidity console logging
 import "@openzeppelin/contracts/utils/Counters.sol"; // Secure incrementor (counter)
@@ -10,7 +10,7 @@ contract Marketplace is ERC721URIStorage {
 
   address payable owner;
 
-  uint256 listPrice = 0.01 ether;
+  uint256 listPrice = 0.001 ether;
 
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
