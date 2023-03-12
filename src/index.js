@@ -17,7 +17,7 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Marketplace />}/>
-        <Route path="/nftPage" element={<NFTPage />}/>
+        <Route path="/nftPage/:tokenId" element={<NFTPage />}/>
         <Route path="/profile" element={<ProfilePage />}/>
         <Route path="/listNFT" element={<ListNFTPage />}/>
       </Routes>

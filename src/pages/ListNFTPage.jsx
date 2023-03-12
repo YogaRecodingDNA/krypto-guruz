@@ -1,6 +1,7 @@
-import Navbar from "../components/Navbar";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "../pinata";
+import Navbar from "../components/Navbar";
 import Marketplace from "../Marketplace.json";
 
 
@@ -8,12 +9,13 @@ const ListNFTPage = () => {
     const [ formParams, setFormParams ] = useState({ name: "", description: "", price: ""});
     const [ fileURL, setFileURL ] = useState(null);
     const [ message, setMessage ] = useState("");
+    const navigate = useNavigate();
     const ethers = require("ethers");
 
 
     // Upload File (IMAGE) to Pinata
     const onChangeFile = async (e) => {
-        let file = e.target.files[0];
+        var file = e.target.files[0];
 
         try {
             const response = await uploadFileToIPFS(file);
@@ -22,13 +24,14 @@ const ListNFTPage = () => {
                 setFileURL(response.pinataURL);
             }
         } catch(error) {
-            console.error("Error during the file upload:", error);
+            console.log("Error during the file upload:", error);
         }
     }
 
     
     // Upload metadata to IPFS and Fetch URL from PINATA
     const uploadMetadataToIPFS = async () => {
+        console.log("formParams", formParams);
         // Check for missing form params
         const { name, description, price } = formParams;
         if (!name || !description || !price || !fileURL) {
@@ -46,8 +49,9 @@ const ListNFTPage = () => {
                 console.log("Successfully uploaded JSON to Pinata: ", response);
                 return response.pinataURL;
             }
-        } catch (error) {
-            console.error("Error uploading metadata to Pinata", error);
+        }
+        catch (error) {
+            console.log("Error uploading metadata to Pinata", error);
         }
     }
 
@@ -61,28 +65,30 @@ const ListNFTPage = () => {
             const metadataURL = await uploadMetadataToIPFS();
             const provider = new ethers.providers.Web3Provider(window.ethereum); // Gateway to Goerli Testnet -> Metamask injects into the browser window
             const signer = provider.getSigner(); // Get the address
-
             setMessage("Uploading now... please wait (up to 5 mins)");
-
+            
             // Retrieve correct contract by passing the address, abi, and signer
             let contract = new ethers.Contract(Marketplace.address, Marketplace.abi, signer);
-
+            
             // Convert decimal val to ethers val so contract understands the values it calculates
             const price = ethers.utils.parseUnits(formParams.price, "ether");
             // Get listed price from contract and convert to string
-            let listingPrice = await contract.getListPrice().toString();
-
-            let transaction = await contract.createToken(metadataURL, price, {value: listingPrice});
+            let listingPrice = await contract.getListPrice();
+            listingPrice = listingPrice.toString();
+            
+            // Mint NFT
+            let transaction = await contract.createNFTToken(metadataURL, price, {value: listingPrice});
             await transaction.wait();
 
             // Message user, reset state fields, redirect to marketplace
             alert("Successfully Minted your NFT!");
             setMessage("");
             setFormParams({ name: "", description: "", price: ""});
-            window.location.replace("/");
+            navigate("/");
 
         } catch (error) {
-            alert("Upload error", error);
+            console.log("Oops! Upload error", error);
+            alert("Oops! Upload error", error);
         }
     }
 
@@ -145,7 +151,7 @@ const ListNFTPage = () => {
                     >
                         Upload Image
                     </label>
-                    <input type={"file"} onChange={onChangeFile} />
+                    <input id="image" type={"file"} accept="image/*" onChange={onChangeFile} />
                 </div>
                 <br></br>
                 <div className="text-green text-center">{message}</div>

@@ -37,8 +37,8 @@
       ]
     },
     "/Users/chadd/Projects/krypto-guruz/contracts/Marketplace.sol": {
-      "lastModificationDate": 1678510418347,
-      "contentHash": "1952acf71ca9fc4cbcb74bd051db134d",
+      "lastModificationDate": 1678587962750,
+      "contentHash": "4e2cbd1918da74f2463f6fa5d5930013",
       "sourceName": "contracts/Marketplace.sol",
       "solcConfig": {
         "version": "0.8.9",

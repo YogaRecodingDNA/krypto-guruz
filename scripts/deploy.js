@@ -5,7 +5,7 @@ const fs = require("fs");
 async function main() {
   // Deploy Marketplace
   const [ deployer ] = await ethers.getSigners();
-  const balance = await deployer.getBalance();
+  
   const Marketplace = await hre.ethers.getContractFactory("Marketplace");
   const marketplace = await Marketplace.deploy();
   // Provider confirmation of deployment

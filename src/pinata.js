@@ -10,6 +10,7 @@ export const uploadJSONToIPFS = async(JSONBody) => {
     return axios 
         .post(url, JSONBody, {
             headers: {
+                'Accept': 'text/plain',
                 pinata_api_key: key,
                 pinata_secret_api_key: secret,
             }
@@ -48,28 +49,29 @@ export const uploadFileToIPFS = async(file) => {
     data.append('pinataMetadata', metadata);
 
     //pinataOptions are optional =========================================
-    const pinataOptions = JSON.stringify({
-        cidVersion: 0,
-        customPinPolicy: {
-            regions: [
-                {
-                    id: 'FRA1',
-                    desiredReplicationCount: 1
-                },
-                {
-                    id: 'NYC1',
-                    desiredReplicationCount: 2
-                }
-            ]
-        }
-    });
-    data.append('pinataOptions', pinataOptions);
+    // const pinataOptions = JSON.stringify({
+    //     cidVersion: 0,
+    //     customPinPolicy: {
+    //         regions: [
+    //             {
+    //                 id: 'FRA1',
+    //                 desiredReplicationCount: 1
+    //             },
+    //             {
+    //                 id: 'NYC1',
+    //                 desiredReplicationCount: 2
+    //             }
+    //         ]
+    //     }
+    // });
+    // data.append('pinataOptions', pinataOptions);
     // ====================================================================
 
     return axios 
         .post(url, data, {
             maxBodyLength: 'Infinity',
             headers: {
+                'Accept': 'text/plain',
                 'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
                 pinata_api_key: key,
                 pinata_secret_api_key: secret,

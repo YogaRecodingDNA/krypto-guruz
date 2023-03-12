@@ -8,19 +8,17 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol"; // ERC721 Standard (qu
 
 contract Marketplace is ERC721URIStorage {
 
+  using Counters for Counters.Counter; // OPEN ZEPPELIN
+  // Has the most recent minted tokenId
+  Counters.Counter private _tokenIds;
+  // Keeps track of the number of items sold on the marketplace
+  Counters.Counter private _itemsSold;
+  // Owner === Contract address that created the smart contract
   address payable owner;
-
+  // Fee charged by marketplace to list an NFT
   uint256 listPrice = 0.001 ether;
 
-  using Counters for Counters.Counter;
-  Counters.Counter private _tokenIds;
-  Counters.Counter private _itemsSold;
-
-  constructor() ERC721("Marketplace", "MKT") {
-    owner = payable (msg.sender);
-  }
-
-  // Listed NFT Data
+  // Structure to store listed NFT Data
   struct ListedToken {
     uint256 tokenId;
     address payable owner;
@@ -28,7 +26,21 @@ contract Marketplace is ERC721URIStorage {
     uint256 price;
     bool currentlyListed;
   }
+
+  //the event emitted when a token is successfully listed
+  event TokenListedSuccess (
+      uint256 indexed tokenId,
+      address owner,
+      address seller,
+      uint256 price,
+      bool currentlyListed
+  );
+
   mapping(uint256 => ListedToken) private tokenIdOfListedNFT;
+
+  constructor() ERC721("Marketplace", "MKT") {
+    owner = payable(msg.sender);
+  }
 
   // Get current NFT token's ID
   function getCurrentToken() public view returns (uint256) {
@@ -42,7 +54,7 @@ contract Marketplace is ERC721URIStorage {
   }
 
   // Get listed NFT token by ID
-  function  getNFTById(uint256 _tokenId) public view returns (ListedToken memory) {
+  function getNFTById(uint256 _tokenId) public view returns (ListedToken memory) {
     return tokenIdOfListedNFT[_tokenId];
   }
 
@@ -53,7 +65,7 @@ contract Marketplace is ERC721URIStorage {
 
   // Update list price
   function updateListPrice(uint256 _listPrice) public payable {
-    require(owner == msg.sender, "Only owner may update teh listing price"); // Check for ownership
+    require(owner == msg.sender, "Only owner may update the listing price"); // Check for ownership
     listPrice = _listPrice;
   }
 
@@ -61,26 +73,30 @@ contract Marketplace is ERC721URIStorage {
   // ==================================== MINTING =============================================
   // ==========================================================================================
   // =============================== CREATE NFT TOKEN ==========================================
-  function createNFTToken(string memory tokenURI, uint256 price) public payable returns(uint) {
-    // Creator pays listing fee for minting on marketplace | Check for sufficient value
-    require(msg.value == listPrice, "Provide enough ether to mint your NFT");
-    require(price > 0, "Make sure the price is not negative");
-
+  function createNFTToken(string memory _tokenURI, uint256 _price) public payable returns(uint) {
+    //Increment the tokenId counter, which is keeping track of the number of minted NFTs
     _tokenIds.increment(); // OPEN ZEPPELIN
-    uint256 currentTokenId = _tokenIds.current();
-    // Ensures validity of recipient location so no lost NFTs
-    _safeMint(msg.sender, currentTokenId); // OPEN ZEPPELIN
+    uint256 newTokenId = _tokenIds.current();
 
-    _setTokenURI(currentTokenId, tokenURI); // OPEN ZEPPELIN
+    //Mint the NFT with tokenId newTokenId to the address who called createNFTToken
+    _safeMint(msg.sender, newTokenId); // Ensures validity of recipient location so no lost NFTs
 
-    createListedNFTToken(currentTokenId, price);
+    // Map the tokenId to the tokenURI (which is an IPFS URL with the NFT metadata)
+    _setTokenURI(newTokenId, _tokenURI); // OPEN ZEPPELIN
 
-    return currentTokenId;
+    // Helper function to update Global variables and emit an event
+    createListedNFTToken(newTokenId, _price);
+
+    return newTokenId;
   }
 
 
   // SET DATA TO "ListedToken" STRUCT FOR NEWLY MINTED NFTs AND ADD TO "tokenIdOfListedNFT" MAPPING
   function createListedNFTToken(uint256 _tokenId, uint256 _price) private {
+     // Creator pays listing fee for minting on marketplace | Check for sufficient value
+    require(msg.value == listPrice, "Provide enough ether to mint your NFT");
+    require(_price > 0, "Make sure the price is not negative");
+
     tokenIdOfListedNFT[_tokenId] = ListedToken(
       _tokenId,
       payable(address(this)), // Function caller / Smart Contract 
@@ -91,10 +107,19 @@ contract Marketplace is ERC721URIStorage {
 
     // Transfer Minted NFT to the contract
     _transfer(msg.sender, address(this), _tokenId); // Contract now the owner, has right to transfer
+
+    //Emit the event for successful transfer. Frontend parses this message and updates the end user
+    emit TokenListedSuccess(
+        _tokenId,
+        address(this),
+        msg.sender,
+        _price,
+        true
+    );
   }
 
   // GET ALL NFTs LISTED FOR SALE IN MARKETPLACE
-  function getAllNFTs() public view returns(ListedToken[] memory) {
+  function getAllNFTs() public view returns (ListedToken[] memory) {
     // Tokem IDs are the number of NFTs listed "prior-to and including" this one
     uint256 nftCount = _tokenIds.current(); // Get NFT Count
     // Create array called "tokens" of ListedTokens - will hold all the NFTs
@@ -115,7 +140,7 @@ contract Marketplace is ERC721URIStorage {
   }
 
   // GET ALL NFTs OF CURRENT CALLER IN MARKETPLACE =======================
-  function getMyNFTs() public view returns(ListedToken[] memory){
+  function getMyNFTs() public view returns (ListedToken[] memory){
     uint256 totalNFTCount = _tokenIds.current(); // Get NFT Count
     uint256 ownedNFTCount = 0; // Get count of NFTs owned by user
 
