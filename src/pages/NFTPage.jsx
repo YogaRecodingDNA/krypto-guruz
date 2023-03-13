@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import Navbar from "../components/Navbar";
 import MarketplaceJSON from "../Marketplace.json"
 import axios from "axios";
-import guru12 from "../assets/guru12.jpeg"
+// import guru12 from "../assets/guru12.jpeg"
 
 const NFTPage = () => {
     const [ data, setData ] = useState({});

@@ -16,7 +16,7 @@ contract Marketplace is ERC721URIStorage {
   // Owner === Contract address that created the smart contract
   address payable owner;
   // Fee charged by marketplace to list an NFT
-  uint256 listPrice = 0.001 ether;
+  uint256 listPrice = 0.01 ether;
 
   // Structure to store listed NFT Data
   struct ListedToken {

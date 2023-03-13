@@ -16,9 +16,9 @@ module.exports = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: 1337
+      chainId: 11155111
     },
-    goerli: {
+    sepolia: {
       url: process.env.REACT_APP_ALCHEMY_API_URL,
       accounts: [ process.env.REACT_APP_PRIVATE_KEY ]
     }

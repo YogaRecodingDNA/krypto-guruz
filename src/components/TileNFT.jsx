@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 
 const TileNFT = ( data ) => {
-    console.log("DATA", data);
+    
     return (
         <Link to={`nftPage/${data.data.tokenId}`}>
         <div className="border-2 ml-12 mt-5 mb-12 flex flex-col items-center rounded-lg w-48 md:w-72 shadow-2xl">

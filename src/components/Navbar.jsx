@@ -35,14 +35,14 @@ function Navbar() {
   
   // Connect to wallet
   const connectWebsite = async () => {
-      // Check if user is on Goerli testnet
+      // Check if user is on Goerli/Sepolia testnet
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      if(chainId !== '0x5') // Goerli's chainID
+      if(chainId !== '0xAA36A7') // chainID
       {
         // alert('Incorrect network! Switch your metamask network to Goerli');
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain', // If not on Goerli, asks to switch
-          params: [{ chainId: '0x5' }],
+          params: [{ chainId: '0xAA36A7' }],
        })
       }
 
@@ -69,7 +69,7 @@ function Navbar() {
     window.ethereum.on('accountsChanged', function(accounts){
       window.location.replace(location.pathname)
     })
-  });
+  }, [location.pathname]);
 
 
     return (
@@ -104,7 +104,7 @@ function Navbar() {
                 <Link to="/listNFT">List My NFT</Link>
               </li>              
               }              
-              {location.pathname === "/profile" ? 
+              {/* {location.pathname === "/profile" ? 
               <li className='w-16 border-b-2 hover:pb-0'>
                 <Link to="/profile">Profile</Link>
               </li>
@@ -112,7 +112,7 @@ function Navbar() {
               <li className='w-16 hover:border-b-2 hover:pb-0'>
                 <Link to="/profile">Profile</Link>
               </li>              
-              }  
+              }   */}
               <li>
                 <button
                   onClick={connectWebsite}

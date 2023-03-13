@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "../pinata";
 import Navbar from "../components/Navbar";
 import Marketplace from "../Marketplace.json";
@@ -9,7 +8,6 @@ const ListNFTPage = () => {
     const [ formParams, setFormParams ] = useState({ name: "", description: "", price: ""});
     const [ fileURL, setFileURL ] = useState(null);
     const [ message, setMessage ] = useState("");
-    const navigate = useNavigate();
     const ethers = require("ethers");
 
 
@@ -84,7 +82,7 @@ const ListNFTPage = () => {
             alert("Successfully Minted your NFT!");
             setMessage("");
             setFormParams({ name: "", description: "", price: ""});
-            navigate("/");
+            
 
         } catch (error) {
             console.log("Oops! Upload error", error);
@@ -138,8 +136,8 @@ const ListNFTPage = () => {
                     <input 
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                         type="number"
-                        placeholder="Min 0.001 ETH"
-                        step="0.001"
+                        placeholder="Min 0.01 ETH"
+                        step="0.01"
                         value={formParams.price}
                         onChange={e => setFormParams({...formParams, price: e.target.value})}
                     />

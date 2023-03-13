@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 import MarketplaceJSON from "../Marketplace.json";
 import Navbar from "../components/Navbar";
 import TileNFT from "../components/TileNFT";
@@ -11,7 +11,9 @@ export default function Profile () {
     const [ totalPrice, setTotalPrice ] = useState("0");
     const [ isDataFetched, setIsDataFetched ] = useState(false);
 
-    const getNFTData = async (tokenId) => {
+    // const getNFTData = async (tokenId) => {
+    const getNFTData = async () => {
+        console.log("Get NFTs");
         const ethers = require("ethers");
         let sumPrice = 0;
 
@@ -20,16 +22,24 @@ export default function Profile () {
         const addr = await signer.getAddress();
 
         //Pull the deployed contract instance
-        let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
+        let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer);
 
         // Get user NFTs
         let transaction = await contract.getMyNFTs();
 
         // Takes metadata from tokenURI and the data returned by getMyNFTs() contract function and creates an object of info to be displayed
-        const myItems = await Promise.all(transaction.map(async nft => {
+        const myItems = await Promise.all(transaction.map(async (nft) => {
+            console.log("NFT", nft);
             const tokenURI = await contract.tokenURI(nft.tokenId);
-            let metadata = await axios.get(tokenURI);
+            let metadata = await axios.get(tokenURI, {
+                headers: {
+                   "Access-Control-Allow-Origin": "*",
+                   'Accept': 'text/plain',
+                   "Access-Control-Allow-Credentials": true
+                }
+            })
             metadata = metadata.data;
+            console.log("metadata", metadata);
 
             let price = ethers.utils.formatUnits(nft.price.toString(), 'ether');
             let item = {
@@ -44,17 +54,19 @@ export default function Profile () {
             sumPrice += Number(price);
             return item;
         }))
-
+        
+        console.log("MY ITEMS", myItems);
         setData(myItems);
         setIsDataFetched(true);
         setAddress(addr);
         setTotalPrice(sumPrice.toPrecision(3));
     }
 
-    const params = useParams();
-    const tokenId = params.tokenId;
+    // const params = useParams();
+    // const tokenId = params.tokenId;
     if(!isDataFetched) {
-        getNFTData(tokenId);
+        // getNFTData(tokenId);
+        getNFTData();
     }
     
     return (

@@ -90,7 +90,7 @@ const MarketplacePage = () => {
                 </div>
                 <div className="flex mt-5 justify-between flex-wrap max-w-screen-xl text-center">
                     {data.map((value, index) => {
-                        console.log("VALUE", value)
+                    console.log(`Value ${index}: `, value);
                         return <TileNFT data={value} key={index}></TileNFT>;
                     })}
                 </div>
